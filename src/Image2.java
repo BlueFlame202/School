@@ -206,7 +206,9 @@ public class Image2 {
         {
         	for (int j = 0; j < picture.height(); j++)
         	{
-        		picture.set(i, j, new Color(picture.get(i, j).getBlue(), picture.get(i, j).getGreen(),  picture.get(i, j).getRed()));
+        		picture.set(i, j, new Color((int)Math.min(picture.get(i, j).getBlue(),255), 
+        				(int)Math.min(picture.get(i, j).getGreen()/3,255), 
+        				(int)Math.min(picture.get(i, j).getRed()*4, 255)));
         	}
         }
         
