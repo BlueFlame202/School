@@ -195,24 +195,92 @@ public class Image2 {
     	return result;
     }
 
+    public static Picture dBlend(Picture s1, Picture s2, boolean mneg) // rn assumes square image
+    {
+    	Picture res = new Picture(Math.min(s1.width(), s2.width()), Math.min(s1.height(), s2.height()));
+    	
+    	double w = res.width();
+    	double h = res.height();
+    	
+    	for (int i = 0; i < w; i++)
+    	{
+    		for (int j = 0; j < h; j++)
+    		{
+    			int j2 = (int) (h - j - 1);
+    			double r = Math.abs(h*i - w*j2)/(w*h);
+    			double u = ((h*i)/w); // doing h - this gives interesting results
+    			if (mneg) // flop the ! around and replace j2 with j and you can get interesting results with diagonal blends
+    			{
+    				u = h - u;
+    				r = Math.abs(h*i + w*j2-w*h)/(w*h);
+    			}
+    			
+    			// double r = 1 - 0.5*(1+(Math.sqrt(Math.pow(i-j,2))/w)); // SQUARES
+    			// double r = (Math.sqrt(Math.pow(i-j,2))/res.width()) // SQUARES
+    			if (j2 < u) // Before the j in j < (h*(w-i))/w was accidentally an i and that gave some p neat results actually
+    				res.set(i, j, new Color((int)(r*s1.get(i, j).getRed() + (1-r)*s2.get(i, j).getRed())
+    						, (int)(r*s1.get(i, j).getGreen() + (1-r)*s2.get(i, j).getGreen())
+    						, (int)(r*s1.get(i, j).getBlue() + (1-r)*s2.get(i, j).getBlue())));
+    			else
+    				res.set(i, j, new Color((int)(r*s2.get(i, j).getRed() + (1-r)*s1.get(i, j).getRed())
+    						, (int)(r*s2.get(i, j).getGreen() + (1-r)*s1.get(i, j).getGreen())
+    						, (int)(r*s2.get(i, j).getBlue() + (1-r)*s1.get(i, j).getBlue())));
+    		}
+    	}
+    	
+    	return res;
+    }
+    
+    public static Picture avg(Picture[] pics)
+    {
+    	Picture res = new Picture(pics[0].width(), pics[0].height());
+    	
+    	double w = res.width();
+    	double h = res.height();
+    	
+    	int rsum = 0;
+    	int bsum = 0;
+    	int gsum = 0;
+    	for (int i = 0; i < w; i++)
+    	{
+    		for (int j = 0; j < h; j++)
+    		{
+    			
+    	    	for (Picture pic : pics)
+    	    	{
+    	    		rsum += pic.get(i, j).getRed();
+    	    		bsum += pic.get(i, j).getBlue();
+    	    		gsum += pic.get(i, j).getGreen();
+    	    	}
+    	    	res.set(i, j, new Color((int)(rsum/pics.length), (int)(gsum/pics.length), (int)(bsum/pics.length)));
+    	    	rsum = 0; bsum = 0; gsum = 0;
+    		}
+    	}
+    	
+    	return res;
+    }
+    
     public static void main(String[] args) {
-        Picture picture = new Picture(args[0]);
-        int width  = picture.width();
-        int height = picture.height();
-        System.out.println("width: " + width);
-        System.out.println("height: " + height);
-        
+        //Picture picture = new Picture(args[0]);
+        //Picture sample = new Picture(args[1]);
+        // dBlend(picture, sample, true).show(); 
+    	
+    	Picture[] pics = new Picture[args.length];
+    	for (int i = 0; i < args.length; i++)
+    		pics[i] = new Picture(args[i]);
+    	
+    	avg(pics).show();
+    	
+        /*
         for (int i = 0; i < picture.width(); i++)
         {
-        	for (int j = 0; j < picture.height(); j++)
+        	for (int j = i; j < picture.height(); j++)
         	{
-        		picture.set(i, j, new Color((int)Math.min(picture.get(i, j).getBlue(),255), 
-        				(int)Math.min(picture.get(i, j).getGreen()/3,255), 
-        				(int)Math.min(picture.get(i, j).getRed()*4, 255)));
+        		picture.set(i, j, sample.get(i,j));
         	}
-        }
+        }*/
         
-        picture.show(); 
+        
     }
 }
 
