@@ -55,14 +55,33 @@ public class LFSR {
 		return s;
 	}
 	
+	public static String encrypt(String plain, LFSR l, int k)
+	{
+		String res = "";
+		for (int i = 0; i < plain.length(); i++)
+			res += (char)(plain.charAt(i) + l.generate(k));
+		return res;
+	}
+	
+	public static String crack(String s, LFSR l, int k)
+	{
+		String res = "";
+		for (int i = 0; i < s.length(); i++)
+			res += (char)(s.charAt(i) - l.generate(k));
+		return res;
+	}
+	
 	public static void main(String[] args)
 	{
 		LFSR g = new LFSR("01101000010100010000", 17);
 		
-		for (int i = 0; i < 10; i++)
-		{
-			System.out.println(g.generateS(8));
-		}
+		//for (int i = 0; i < 10; i++)
+		//{
+		//	System.out.println(g.generateS(8));
+		//}
+		
+		//System.out.println(encrypt("blades of sand", g, 4));
+		System.out.println(crack("dvnmfz,pg*|mwp", g, 4));
 	}
 	
 }

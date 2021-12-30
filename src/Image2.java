@@ -77,6 +77,72 @@ public class Image2 {
     	return f;
     }
     
+    public static Picture crack(Picture original, LFSR t)
+    {
+    	Picture res = original;
+    	
+    	int basisWidth = original.width();
+    	int basisHeight = original.height();
+    	
+    			
+    	double dev = 0;
+    	int l = 0;
+    			
+	    for (int col = 0; col < basisWidth; col++)
+	    {
+	    	for (int row = 0; row < basisHeight; row++)
+	        {
+	            int r = original.get(col, row).getRed();
+	            int g = original.get(col, row).getGreen();
+	            int b = original.get(col, row).getBlue();
+	            		
+	            String sr = Integer.toBinaryString(r);
+	            String sg = Integer.toBinaryString(g);
+	            String sb = Integer.toBinaryString(b);
+	            String sx = t.generateS(8);
+	            String result = "";
+	            		
+	            while (sr.length() < 8)
+	            	sr = "0" + sr;
+	            for (int k = 0; k < sr.length(); k++)
+	            {
+	           		result += "" + ((sr.charAt(k) != sx.charAt(k)) ? 1 : 0);
+	            }
+	            r = Integer.parseInt(result, 2);
+	            dev = ((dev * l) + (Math.abs(r - 128.0)))/(l+1);
+	            l++;
+	            		
+	            sx = t.generateS(8);
+	            result = "";
+	            while (sg.length() < 8)
+	            	sg = "0" + sg;
+	            for (int k = 0; k < sg.length(); k++)
+	            {
+	            	result += "" + ((sg.charAt(k) != sx.charAt(k)) ? 1 : 0);
+	            }
+	            g = Integer.parseInt(result, 2);
+	            dev = ((dev * l) + (Math.abs(g - 128.0)))/(l+1);
+	            l++;
+	            		
+	            sx = t.generateS(8);
+	            result = "";
+	            while (sb.length() < 8)
+	            	sb = "0" + sb;
+	            for (int k = 0; k < sb.length(); k++)
+	            {
+	            	result += "" + ((sb.charAt(k) != sx.charAt(k)) ? 1 : 0);
+	            }
+	            b = Integer.parseInt(result, 2);
+	            dev = ((dev * l) + (Math.abs(b - 128.0)))/(l+1);
+	            l++;
+	            		
+	            original.set(col, row, new Color(r, g, b));
+	        }
+        }
+	        	
+    	return res;
+    }
+    
     public static Picture crack(Picture original, int length)
     {
     	double maxDev = 0;
@@ -265,11 +331,11 @@ public class Image2 {
         //Picture sample = new Picture(args[1]);
         // dBlend(picture, sample, true).show(); 
     	
-    	Picture[] pics = new Picture[args.length];
-    	for (int i = 0; i < args.length; i++)
-    		pics[i] = new Picture(args[i]);
+    	//Picture[] pics = new Picture[args.length];
+    	//for (int i = 0; i < args.length; i++)
+    	//	pics[i] = new Picture(args[i]);
     	
-    	avg(pics).show();
+    	//avg(pics).show();
     	
         /*
         for (int i = 0; i < picture.width(); i++)
@@ -280,7 +346,10 @@ public class Image2 {
         	}
         }*/
         
-        
+        Picture pic = new Picture(args[0]);
+        Picture res = crack(pic, new LFSR("01101000010100010000", 17));
+        res.show();
+        //crack(pic, 8).show();
     }
 }
 
