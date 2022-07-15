@@ -80,8 +80,8 @@ public class LFSR {
 		//	System.out.println(g.generateS(8));
 		//}
 		
-		//System.out.println(encrypt("blades of sand", g, 4));
-		System.out.println(crack("dvnmfz,pg*|mwp", g, 4));
+		//System.out.println(encrypt("If you're reading this, dm me... that's pretty interesting!", g, 4));
+		System.out.println(crack("Kp-?p|3sf*{qjpwuo'ut~6%ds&ur130.xqmy3s'~}qw|?%v}?f}gtyupi,", g, 4));
 	}
 	
 }

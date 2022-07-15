@@ -282,7 +282,7 @@ public class Image2 {
     			}
     			
     			// double r = 1 - 0.5*(1+(Math.sqrt(Math.pow(i-j,2))/w)); // SQUARES
-    			// double r = (Math.sqrt(Math.pow(i-j,2))/res.width()) // SQUARES
+    			// double r = (Math.sqrt(Math.pow(i-j,2))/res.width()); // SQUARES
     			if (j2 < u) // Before the j in j < (h*(w-i))/w was accidentally an i and that gave some p neat results actually
     				res.set(i, j, new Color((int)(r*s1.get(i, j).getRed() + (1-r)*s2.get(i, j).getRed())
     						, (int)(r*s1.get(i, j).getGreen() + (1-r)*s2.get(i, j).getGreen())
@@ -291,6 +291,36 @@ public class Image2 {
     				res.set(i, j, new Color((int)(r*s2.get(i, j).getRed() + (1-r)*s1.get(i, j).getRed())
     						, (int)(r*s2.get(i, j).getGreen() + (1-r)*s1.get(i, j).getGreen())
     						, (int)(r*s2.get(i, j).getBlue() + (1-r)*s1.get(i, j).getBlue())));
+    		}
+    	}
+    	
+    	return res;
+    }
+    
+    public static Picture dBlend2(Picture s1, Picture s2, double k, boolean mneg, double rbalance, double gbalance, double bbalance)
+    {
+    	Picture res = new Picture(Math.min(s1.width(), s2.width()), Math.min(s1.height(), s2.height()));
+    	
+    	double w = res.width();
+    	double h = res.height();
+    	
+    	for (int i = 0; i < w; i++)
+    	{
+    		for (int j = 0; j < h; j++)
+    		{
+    			double a = i*i + j*j;
+    			double b = (w-i)*(w-i) + (h-j)*(h-j);
+    			
+    			Math.pow(a, k);
+    			Math.pow(b, k);
+    			
+    			// Normalize so that a and b add to one:
+    			a = a/(a+b);
+    			b = b/(a+b);
+    			
+    			res.set(i, j, new Color((int)(Math.min((a*(double)s1.get(i, j).getRed() + b*(double)s2.get(i, j).getRed())/rbalance,255))
+						, (int)(Math.min((a*(double)s1.get(i, j).getGreen() + b*(double)s2.get(i, j).getGreen())/gbalance,255))
+						, (int)(Math.min((a*(double)s1.get(i, j).getBlue() + b*(double)s2.get(i, j).getBlue())/bbalance,255))));
     		}
     	}
     	
@@ -327,28 +357,39 @@ public class Image2 {
     }
     
     public static void main(String[] args) {
-        //Picture picture = new Picture(args[0]);
-        //Picture sample = new Picture(args[1]);
-        // dBlend(picture, sample, true).show(); 
-    	
+        Picture picture = new Picture(args[0]);
+        Picture sample = new Picture(args[1]);
+        
+        Picture[] pics = new Picture[6];
+        pics[0] = dBlend2(picture, sample, 5, false, 2, 1, 1);
+        pics[1] = new Picture(args[2]);
+        pics[2] = dBlend2(picture, sample, 5, false, 2, 1, 1);
+        pics[3] = dBlend2(picture, sample, 5, false, 2, 1, 1);
+        pics[4] = dBlend2(picture, sample, 5, false, 2, 1, 1);
+        pics[5] = dBlend2(picture, sample, 5, false, 2, 1, 1);
+        
+         avg(pics).show(); 
+         
     	//Picture[] pics = new Picture[args.length];
     	//for (int i = 0; i < args.length; i++)
     	//	pics[i] = new Picture(args[i]);
     	
     	//avg(pics).show();
     	
-        /*
-        for (int i = 0; i < picture.width(); i++)
-        {
-        	for (int j = i; j < picture.height(); j++)
-        	{
-        		picture.set(i, j, sample.get(i,j));
-        	}
-        }*/
         
-        Picture pic = new Picture(args[0]);
-        Picture res = crack(pic, new LFSR("01101000010100010000", 17));
-        res.show();
+        //for (int i = 0; i < picture.width(); i++)
+        //{
+        //	for (int j = 0; j < picture.height(); j++)
+        //	{
+        //		picture.set(i, j, new Color((int)(255*Math.random()), (int)(255 * Math.random()), Math.min(picture.get(i, j).getBlue()/*/4*/ + (int)(30*Math.random()), 255)));
+        //		picture.set(i, j, new Color(picture.get(i, j).getRed(), (int)(0.8 * picture.get(i, j).getGreen() + 0.2 * picture.get(i, j).getBlue()/2), picture.get(i, j).getBlue()));
+        //	}
+        //}
+        //picture.show();
+        
+        //Picture pic = new Picture(args[0]);
+        //Picture res = crack(pic, new LFSR("01101000010100010000", 17));
+        //res.show();
         //crack(pic, 8).show();
     }
 }
