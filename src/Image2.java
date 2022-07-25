@@ -297,7 +297,7 @@ public class Image2 {
     	return res;
     }
     
-    public static Picture dBlend2(Picture s1, Picture s2, double k, boolean mneg, double rbalance, double gbalance, double bbalance)
+    public static Picture dBlend2(Picture s1, Picture s2, double k, double rbalance, double gbalance, double bbalance)
     {
     	Picture res = new Picture(Math.min(s1.width(), s2.width()), Math.min(s1.height(), s2.height()));
     	
@@ -317,6 +317,31 @@ public class Image2 {
     			// Normalize so that a and b add to one:
     			a = a/(a+b);
     			b = b/(a+b);
+    			
+    			res.set(i, j, new Color((int)(Math.min((a*(double)s1.get(i, j).getRed() + b*(double)s2.get(i, j).getRed())/rbalance,255))
+						, (int)(Math.min((a*(double)s1.get(i, j).getGreen() + b*(double)s2.get(i, j).getGreen())/gbalance,255))
+						, (int)(Math.min((a*(double)s1.get(i, j).getBlue() + b*(double)s2.get(i, j).getBlue())/bbalance,255))));
+    		}
+    	}
+    	
+    	return res;
+    }
+    
+    public static Picture cBlend(Picture s1, Picture s2, double k, double rbalance, double gbalance, double bbalance)
+    {
+    	Picture res = new Picture(Math.min(s1.width(), s2.width()), Math.min(s1.height(), s2.height()));
+    	
+    	double w = res.width();
+    	double h = res.height();
+    	
+    	for (int i = 0; i < w; i++)
+    	{
+    		for (int j = 0; j < h; j++)
+    		{
+    			double a = 2 * Math.abs(i - w/2)/w; // a \in [0,1]
+    			
+    			a = Math.pow(a, k);
+    			double b = 1 - a;
     			
     			res.set(i, j, new Color((int)(Math.min((a*(double)s1.get(i, j).getRed() + b*(double)s2.get(i, j).getRed())/rbalance,255))
 						, (int)(Math.min((a*(double)s1.get(i, j).getGreen() + b*(double)s2.get(i, j).getGreen())/gbalance,255))
@@ -359,17 +384,15 @@ public class Image2 {
     public static void main(String[] args) {
         Picture picture = new Picture(args[0]);
         Picture sample = new Picture(args[1]);
+    	
         
-        Picture[] pics = new Picture[6];
-        pics[0] = dBlend2(picture, sample, 5, false, 2, 1, 1);
-        pics[1] = new Picture(args[2]);
-        pics[2] = dBlend2(picture, sample, 5, false, 2, 1, 1);
-        pics[3] = dBlend2(picture, sample, 5, false, 2, 1, 1);
-        pics[4] = dBlend2(picture, sample, 5, false, 2, 1, 1);
-        pics[5] = dBlend2(picture, sample, 5, false, 2, 1, 1);
-        
-         avg(pics).show(); 
-         
+        // cblend (blend along x = width/2) // in the future make a blend across any lambda function
+    	double w = picture.width();
+    	double h = picture.height();
+    	
+    	cBlend(sample, picture, 10, 1, 1, 1).show();
+    	
+    	
     	//Picture[] pics = new Picture[args.length];
     	//for (int i = 0; i < args.length; i++)
     	//	pics[i] = new Picture(args[i]);
